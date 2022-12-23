@@ -1,6 +1,7 @@
-version: "3.8"
+version: "3.9"
 
 volumes:
+  cht-credentials:
   prometheus-data:
     driver: local
     driver_opts:
@@ -9,20 +10,30 @@ volumes:
       o: bind
 
 services:
-  couchdb:
-    image: apache/couchdb:2
+  couchdb.1:
+    image: public.ecr.aws/medic/cht-couchdb:4.1.0-alpha
     ports:
       - "5984:5984"
       - "5986:5986"
     volumes:
-      - ./couch/data:/opt/couchdb/data
-      - ./couch/config:/opt/couchdb/etc/local.d
+      - ${DB1_DATA:-./couch/data/srv1}:/opt/couchdb/data
+      - cht-credentials:/opt/couchdb/etc/local.d/
     environment:
       - COUCHDB_USER=${COUCHDB_USER:-myadminuser}
       - COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-myadminpass}
-    networks:
-      - couch-net
+      - COUCHDB_SECRET=${COUCHDB_SECRET:-6c1953b6-e64d-4b0c-9268-2528396f2f58}
+      - COUCHDB_UUID=${COUCHDB_UUID:-5c265815-b9e3-47f1-ba8d-c1d50495eeb2}
+      - SVC_NAME=${SVC1_NAME:-couchdb.1}
+      - COUCHDB_LOG_LEVEL=${COUCHDB_LOG_LEVEL:-error}
+    logging:
+      driver: local
+      options:
+        max-size: ${LOG_MAX_SIZE:-50m}
+        max-file: ${LOG_MAX_FILES:-20}
     restart: unless-stopped
+    networks:
+      cht-net:
+
   prometheus:
     image: prom/prometheus
     ports:
@@ -31,16 +42,18 @@ services:
       - ./prometheus/config:/etc/prometheus
       - prometheus-data:/prometheus
     networks:
-      - couch-net
+      cht-net:
     restart: unless-stopped
+
   couchdb-prometheus-exporter:
     image: gesellix/couchdb-prometheus-exporter
-    command: --couchdb.uri=http://couchdb:5984 --logtostderr --couchdb.username=${COUCHDB_USER:-myadminuser} --couchdb.password=${COUCHDB_PASSWORD:-myadminpass} --databases=_all_dbs
+    command: --couchdb.uri=http://couchdb.1:5984 --logtostderr --couchdb.username=${COUCHDB_USER:-myadminuser} --couchdb.password=${COUCHDB_PASSWORD:-myadminpass} --databases=_all_dbs
     ports:
       - "9984:9984"
     networks:
-      - couch-net
+      cht-net:
     restart: unless-stopped
 
 networks:
-  couch-net:
+  cht-net:
+    name: ${CHT_NETWORK:-cht-net}

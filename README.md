@@ -6,13 +6,6 @@ The goal of this project is to provide an easy way to evaluate and experiment wi
 
 ## Usage
 
-### Environment Variables
-
-Set the desired values for the following in your environment or in an `.env` file:
-
-- `COUCHDB_USER` - The main admin username
-- `COUCHDB_PASSWORD` - The main admin password
-
 ### Running
 
 ```bash
