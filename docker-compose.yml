@@ -1,0 +1,46 @@
+version: "3.8"
+
+volumes:
+  prometheus-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${PWD}/prometheus/data
+      o: bind
+
+services:
+  couchdb:
+    image: apache/couchdb:2
+    ports:
+      - "5984:5984"
+      - "5986:5986"
+    volumes:
+      - ./couch/data:/opt/couchdb/data
+      - ./couch/config:/opt/couchdb/etc/local.d
+    environment:
+      - COUCHDB_USER=${COUCHDB_USER:-myadminuser}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-myadminpass}
+    networks:
+      - couch-net
+    restart: unless-stopped
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/config:/etc/prometheus
+      - prometheus-data:/prometheus
+    networks:
+      - couch-net
+    restart: unless-stopped
+  couchdb-prometheus-exporter:
+    image: gesellix/couchdb-prometheus-exporter
+    command: --couchdb.uri=http://couchdb:5984 --logtostderr --couchdb.username=${COUCHDB_USER:-myadminuser} --couchdb.password=${COUCHDB_PASSWORD:-myadminpass} --databases=_all_dbs
+    ports:
+      - "9984:9984"
+    networks:
+      - couch-net
+    restart: unless-stopped
+
+networks:
+  couch-net:
