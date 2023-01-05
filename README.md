@@ -1,6 +1,6 @@
 # couch-with-metrics
 
-Example Docker Compose configuration for setting up metrics collection for a Couch database using Prometheus.
+Example Docker Compose configuration for setting up metrics collection for a https://github.com/medic/cht-core/ using Prometheus.
 
 The goal of this project is to provide an easy way to evaluate and experiment with CouchDB metrics on Prometheus.
 
