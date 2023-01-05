@@ -35,7 +35,9 @@ sudo rm -rf prometheus/data
 
 ### Seeing metrics
 
-Prometheus has a basic web interface at http://localhost:9090/ that allows for running queries and viewing simple graphs.  For example, [this page](http://localhost:9090/graph?g0.expr=couchdb_database_doc_count%7Bdb_name%3D~%22medic%22%7D&g0.tab=0) should show the number of documents in the `medic` database.
+Prometheus has a basic web interface at http://localhost:9090/ that allows for running queries and viewing simple graphs.  For example, [this page](http://localhost:9090/graph?g0.expr=couchdb_database_doc_count%7Bdb_name%3D~%22medic%22%7D&g0.tab=0) should show the number of documents in the `medic` database:
+
+![](./prometheus.png)
 
 To see what CouchDB metrics are available to be queried, visit http://localhost:9984/metrics.    
 
