@@ -14,7 +14,7 @@ The [`docker-compose.external-couch.yml`](./docker-compose.external-couch.yml) c
 
 ### Running
 
-Configure the Couch user (and instance, if connecting to an external database) in the [`.env`](./.env) file.  Then, run the following command to start the services:
+First, cop `dist-env` to a file called `.env`. Then, configure the Couch user (and instance, if connecting to an external database) in the [`.env`](./.env) file.  Then, run the following command to start the services:
 
 ```sh
 mkdir prometheus/data
