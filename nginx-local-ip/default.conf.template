@@ -1,0 +1,42 @@
+server {  # Redirect incoming HTTP requests to the HTTPS port
+  listen 80;
+  return 301 https://$host$request_uri;
+}
+
+server {
+
+  server_name my.local-ip.co;
+
+  listen 443 ssl;
+
+  ssl_certificate           /etc/nginx/server.chained.pem;
+  ssl_certificate_key       /etc/nginx/server.key;
+
+  ssl_protocols TLSv1.1 TLSv1.2 TLSv1.3;
+
+  sendfile                  on;
+  tcp_nopush                on;
+
+  gzip                      on;
+
+
+  proxy_buffers             16 16k;
+  proxy_buffer_size         16k;
+  proxy_max_temp_file_size  0;
+  client_max_body_size      32M; # Match maximum body parser limits from cht-core api
+
+  location = / {
+    add_header  Content-Type    application/json;
+    return 200 '{   "couchdb": "Welcome",   "version": "2.3.1",   "git_sha": "c298091a4",   "uuid": "3ed6967923ff8b83f5e7f216b4653f94",   "features": [     "pluggable-storage-engines",     "scheduler"   ],   "vendor": {     "name": "The Apache Software Foundation"   } } ';
+  }
+
+  location / {
+
+    proxy_set_header        X-Real-IP $remote_addr;
+    proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header        X-Forwarded-Proto $scheme;
+
+    proxy_pass              ${APP_URL}; # Running on Docker, localhost:port is not accessible
+    proxy_read_timeout      900;        # Default 60 secs, 900 = 15 min => debugging purpose
+  }
+}

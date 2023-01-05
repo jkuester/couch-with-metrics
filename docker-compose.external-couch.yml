@@ -1,0 +1,52 @@
+version: "3.9"
+
+volumes:
+  prometheus-external-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${PWD}/prometheus/data
+      o: bind
+
+services:
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/config:/etc/prometheus
+      - prometheus-external-data:/prometheus
+    networks:
+      couch-external-net:
+    restart: unless-stopped
+
+  couch-relay:
+    image: medicmobile/nginx-local-ip
+    volumes:
+      - ./nginx-local-ip/default.conf.template:/etc/nginx/templates/default.conf.template
+      - ./nginx-local-ip/entrypoint.sh:/entrypoint.sh
+    environment:
+      APP_URL: ${APP_URL}
+    networks:
+      couch-external-net:
+    restart: always
+
+  couchdb-prometheus-exporter:
+    image: gesellix/couchdb-prometheus-exporter
+    env_file:
+      - .env
+    volumes:
+      - ./web-config.yml:/web-config.yml
+    command: --couchdb.uri=https://${COUCHDB_USER}:${COUCHDB_PASSWORD}@couch-relay --logtostderr --databases=_all_dbs
+    ports:
+      # Optional - for accessing the exporter's metric documentation
+      - "9984:9984"
+    networks:
+      couch-external-net:
+    restart: unless-stopped
+
+networks:
+  couch-external-net:
+    ipam:
+      config:
+        - subnet: 172.16.0.0/16

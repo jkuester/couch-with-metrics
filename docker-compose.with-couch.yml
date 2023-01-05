@@ -19,8 +19,8 @@ services:
       - ${DB1_DATA:-./couch/data/srv1}:/opt/couchdb/data
       - cht-credentials:/opt/couchdb/etc/local.d/
     environment:
-      - COUCHDB_USER=${COUCHDB_USER:-myadminuser}
-      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-myadminpass}
+      - COUCHDB_USER=${COUCHDB_USER}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
       - COUCHDB_SECRET=${COUCHDB_SECRET:-6c1953b6-e64d-4b0c-9268-2528396f2f58}
       - COUCHDB_UUID=${COUCHDB_UUID:-5c265815-b9e3-47f1-ba8d-c1d50495eeb2}
       - SVC_NAME=${SVC1_NAME:-couchdb.1}
@@ -47,8 +47,9 @@ services:
 
   couchdb-prometheus-exporter:
     image: gesellix/couchdb-prometheus-exporter
-    command: --couchdb.uri=http://couchdb.1:5984 --logtostderr --couchdb.username=${COUCHDB_USER:-myadminuser} --couchdb.password=${COUCHDB_PASSWORD:-myadminpass} --databases=_all_dbs
+    command: --couchdb.uri=http://couchdb.1:5984 --logtostderr --couchdb.username=${COUCHDB_USER} --couchdb.password=${COUCHDB_PASSWORD} --databases=_all_dbs
     ports:
+      # Optional - for accessing the exporter's metric documentation
       - "9984:9984"
     networks:
       cht-net:

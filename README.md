@@ -1,26 +1,34 @@
 # couch-with-metrics
 
-Example Docker Compose configuration for setting up a CouchDB instance wired up to a Prometheus instance for metrics collection.
+Example Docker Compose configuration for setting up metrics collection for a Couch database using Prometheus.
 
 The goal of this project is to provide an easy way to evaluate and experiment with CouchDB metrics on Prometheus.
 
 ## Usage
 
+Two separate usage flavors are supported.  
+
+The [`docker-compose.with-couch.yml`](./docker-compose.with-couch.yml) configuration can be used to start a local CouchDB instance (along with the required Prometheus and exporter services).  
+
+The [`docker-compose.external-couch.yml`](./docker-compose.external-couch.yml) configuration can be used to start the Prometheus and exporter services connected to an existing Couch (or CHT) instance.  _(A typical CHT deployment will technically not allow direct access to the Couch database. Instead, all requests will be filtered through the CHT API. The provided external configuration supports collecting the Couch metrics through the CHT API.)_
+
 ### Running
 
-```bash
+Configure the Couch user (and instance, if connecting to an external database) in the [`.env`](./.env) file.  Then, run the following command to start the services:
+
+```sh
 mkdir prometheus/data
-docker compose up -d
+docker compose -f docker-compose.*flavor*.yml up -d
 ```
 
-This will start a CouchDB instance available at `http://localhost:5984` and a Prometheus instance available at `http://localhost:9090`.
+This will start a Prometheus instance available at `http://localhost:9090`. (If starting a local Couch instance, it will be available at `http://localhost:5984`.)
 
 ### Stopping
 
 To stop the instance and clear all the data, run:
 
-```bash
-docker compose down
+```sh
+docker compose -f docker-compose.*flavor*.yml down
 sudo rm -rf couch
 sudo rm -rf prometheus/data
 ```
