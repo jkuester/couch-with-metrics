@@ -1,6 +1,6 @@
 # couch-with-metrics
 
-Example Docker Compose configuration for setting up metrics collection for a Couch database using Prometheus.
+Example Docker Compose configuration for setting up metrics collection for a https://github.com/medic/cht-core/ using Prometheus.
 
 The goal of this project is to provide an easy way to evaluate and experiment with CouchDB metrics on Prometheus.
 
@@ -14,7 +14,7 @@ The [`docker-compose.external-couch.yml`](./docker-compose.external-couch.yml) c
 
 ### Running
 
-Configure the Couch user (and instance, if connecting to an external database) in the [`.env`](./.env) file.  Then, run the following command to start the services:
+First, copy `dist-env` [`dist-env`](./dist-env) to a file called `.env`. Then, configure the Couch user (and instance, if connecting to an external database) in the newly created`.env`  file.  Finally, run the following command to start the services:
 
 ```sh
 mkdir prometheus/data
@@ -35,7 +35,9 @@ sudo rm -rf prometheus/data
 
 ### Seeing metrics
 
-Prometheus has a basic web interface at http://localhost:9090/ that allows for running queries and viewing simple graphs.  For example, [this page](http://localhost:9090/graph?g0.expr=couchdb_database_doc_count%7Bdb_name%3D~%22medic%22%7D&g0.tab=0) should show the number of documents in the `medic` database.
+Prometheus has a basic web interface at http://localhost:9090/ that allows for running queries and viewing simple graphs.  For example, [this page](http://localhost:9090/graph?g0.expr=couchdb_database_doc_count%7Bdb_name%3D~%22medic%22%7D&g0.tab=0) should show the number of documents in the `medic` database:
+
+![](./prometheus.png)
 
 To see what CouchDB metrics are available to be queried, visit http://localhost:9984/metrics.    
 

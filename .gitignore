@@ -1,3 +1,4 @@
 couch
 prometheus/data
 .idea
+.env
